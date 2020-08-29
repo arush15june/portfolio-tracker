@@ -16,29 +16,41 @@ const portfolioListStyle = {
 }
 
 function Home() {
+    const transformPortfolioObject = (portfolio) => {
+        return <PortfolioCard portfolioDeactivateCallback={portfolioDeactivateCallback} portfolio={portfolio} />
+    }
+    
     const [portfolioList, setPortfolioList] = useState([])
     const [portfolioListError, setPortfolioListError] = useState(<></>)
 
-    useEffect(() => {
-        const fetchSetPortfolioList = async () => {
-            try {
-                const portfolioListResponse = await getAllPortfolios()
-                const portfolios = portfolioListResponse.data.map((item) => {
-                    return <PortfolioCard portfolio={item} />
-                })
-                setPortfolioList(portfolios)
-            } catch(err) {
-                setPortfolioListError(<p>Error fetching data...</p>)
-            }
+    const fetchSetPortfolioList = async () => {
+        try {
+            const portfolioListResponse = await getAllPortfolios()
+            const portfolios = portfolioListResponse.data.map((item) => {
+                return transformPortfolioObject(item)
+            })
+            setPortfolioList(portfolios)
+        } catch(err) {
+            setPortfolioListError(<p>Error fetching data...</p>)
         }
+    }
 
+    useEffect(() => {
         fetchSetPortfolioList()
     }, [])
+    
+    const newPortfolioCallback = async (portfolioResponse) => {
+        setPortfolioList([transformPortfolioObject(portfolioResponse.data)].concat(portfolioList))
+    }
+    
+    const portfolioDeactivateCallback = async (portfolioDeactivated) => {
+        fetchSetPortfolioList()
+    }
     
     return (
         <>
         <section style={portfolioFormStyle}>
-            <NewPortfolioForm />
+            <NewPortfolioForm newPortfolioCallback={newPortfolioCallback}/>
         </section>
         <section style={portfolioListStyle}>
             {portfolioListError}

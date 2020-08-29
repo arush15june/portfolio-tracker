@@ -27,10 +27,19 @@ async def new_portfolio(portfolio: schemas.PortfolioCreate, db: Session = Depend
 
 @router.get("/portfolio/{portfolio_id}", tags=PORTFOLIO_TAGS)
 async def get_portfolio(portfolio_id: int, db: Session = Depends(get_db)):
-    """Create new portfolio to store stock picks.
+    """Fetch a portfolio from database.
     """
-    portfolio = crud.get_portfolio(db, portfolio_id)
-    print(portfolio.absolute_return)
+    try:
+        portfolio = crud.get_portfolio(db, portfolio_id)
+    except crud.PortfolioNotFoundError as e:
+        raise HTTPException(status_code=400, detail={"error": "Invalid portfolio ID.", "portfolio_id": e.portfolio_id})
+    return schemas.PortfolioPicks.from_orm(portfolio)
+
+@router.delete("/portfolio/{portfolio_id}", tags=PORTFOLIO_TAGS)
+async def deactivate_portfolio(portfolio_id: int, db: Session = Depends(get_db)):
+    """Fetch a portfolio from database.
+    """
+    portfolio = crud.deactivate_portfolio(db, portfolio_id)
     return schemas.PortfolioPicks.from_orm(portfolio)
 
 @router.post("/portfolio/{portfolio_id}/pick", tags=PORTFOLIO_TAGS)
@@ -46,7 +55,7 @@ async def create_portfolio_pick(portfolio_id: int, pick: schemas.PickCreate, db:
 
 @router.delete("/portfolio/{portfolio_id}/pick/{pick_id}", tags=PORTFOLIO_TAGS)
 async def create_portfolio_pick(portfolio_id: int, pick_id: int, db: Session = Depends(get_db)):
-    """Create new pick in portfolio.
+    """Delete a pick from a portfolio.
     """
     try:
         pick = crud.delete_portfolio_pick(db, portfolio_id, pick_id)

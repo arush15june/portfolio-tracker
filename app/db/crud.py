@@ -7,12 +7,27 @@ from sqlalchemy import desc
 from stocks.helper import StockHelper, StockFetchError 
 from . import models, schemas
 
+@dataclass
+class PortfolioNotFoundError(Exception):
+    portfolio_id: int
 
 def get_portfolio(db: Session, portfolio_id: int) -> models.Portfolio:
-    return db.query(models.Portfolio).filter(models.Portfolio.id == portfolio_id).first()
+    db_portfolio = db.query(models.Portfolio).get(portfolio_id)
+    if db_portfolio is None:
+        raise PortfolioNotFoundError(portfolio_id=portfolio_id)
+
+    return db_portfolio
+
+def deactivate_portfolio(db: Session, portfolio_id: int) -> models.Portfolio:
+    db_portfolio = db.query(models.Portfolio).get(portfolio_id)
+    db_portfolio.is_active = False
+
+    db.commit()
+    db.refresh(db_portfolio)
+    return db_portfolio
 
 def get_portfolios(db: Session, skip: int = 0, limit: int = 100) -> List[models.Portfolio]:
-    return db.query(models.Portfolio).order_by(desc(models.Portfolio.created_on)    ).offset(skip).limit(limit).all()
+    return db.query(models.Portfolio).order_by(desc(models.Portfolio.created_on)).filter_by(is_active=True).offset(skip).limit(limit).all()
 
 class CreatePortfolioCommitError(Exception):
     pass
@@ -64,10 +79,6 @@ def get_stock(db: Session, symbol: str) -> models.Stock:
 
     db.refresh(db_stock)
     return db_stock
-
-@dataclass
-class PortfolioNotFoundError(Exception):
-    portfolio_id: int
 
 class CreatePortfolioPickCommitError(Exception):
     pass

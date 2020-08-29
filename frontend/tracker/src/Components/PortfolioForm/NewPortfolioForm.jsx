@@ -1,5 +1,7 @@
-import React from 'react';
-import { FormGroup, InputGroup, Button } from '@blueprintjs/core'
+import React, { useState } from 'react';
+import { FormGroup, InputGroup, Button, setHotkeysDialogProps } from '@blueprintjs/core'
+import { newPortfolio } from  '../../Api/Api.jsx';
+
 
 const flexCol = {
     display: "flex",
@@ -15,20 +17,52 @@ const formGroupPadding = {
     padding:"0.5rem"
 }
 
-function NewPortfolioForm() {
+function NewPortfolioForm(props) {
+    const [newPortfolioError, setNewPortfolioError] = useState(<></>)
+    
+    const newPortfolioHandler = async (evt) => {
+        evt.preventDefault()
+
+        let name = evt.target.name.value
+        let description = evt.target.description.value
+        
+        try {
+            const response = await newPortfolio({
+                name: name,
+                description: description
+            })
+            if (response.status === 200) {
+                props.newPortfolioCallback(response)
+            } else {
+                setNewPortfolioError(<p>Error processing new portfolio.</p>)
+            }
+        } catch(err) {
+            if (err.response) {
+                if (err.response.status === 400) {
+                    setNewPortfolioError(<p>Error creating new portfolio. {err.response.data.detail.error}</p>)
+                    return
+                }
+            }
+            setNewPortfolioError(<p>Error creating new portfolio.</p>)
+        }
+    }
+    
     return (
         <>
-        <form style={flexCol}>
+        <form onSubmit={newPortfolioHandler} style={flexCol}>
             <FormGroup style={formGroupPadding}>
-                <InputGroup large id="name" placeholder="Portfolio Name" />
+                <InputGroup required id="name" placeholder="Portfolio Name" />
             </FormGroup>
             <FormGroup style={formGroupPadding}>
-                <InputGroup large id="description" placeholder="Portfolio Description" />
+                <InputGroup required id="description" placeholder="Portfolio Description" />
             </FormGroup>
             <FormGroup style={{...formGroupPadding}}>
-                <Button icon="plus">Portfolio</Button> 
+                <Button type="submit" icon="plus">Portfolio</Button> 
             </FormGroup>
         </form>
+        <div>
+            {newPortfolioError}
+        </div>
         </>
     );
 }

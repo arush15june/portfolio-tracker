@@ -29,6 +29,10 @@ const newPortfolio = async (portfolioData) => {
     return await instance.post(PORTFOLIO_ENDPOINT, portfolioData)
 }
 
+const deactivatePortfolio = async (portfolioId) => {
+    return await instance.delete(`${PORTFOLIO_ENDPOINT}/${portfolioId}`)
+}
+
 const createPortfolioPick = async (portfolioId, portfolioPickPayload) => {
     const PICK_ENDPOINT = "/pick"
     return await instance.post(`${PORTFOLIO_ENDPOINT}/${portfolioId}${PICK_ENDPOINT}`, portfolioPickPayload)
@@ -47,6 +51,7 @@ export {
     getAllPortfolios,
     getPortfolio,
     newPortfolio,
+    deactivatePortfolio,
     getSymbolInfo,
     createPortfolioPick,
     deletePortfolioPick,

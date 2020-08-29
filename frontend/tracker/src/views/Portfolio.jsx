@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-    useRouteMatch,
-    useParams
+    useRouteMatch
 } from 'react-router-dom';
 import NewPickForm from "../Components/NewPickForm/NewPickForm.jsx"
 import PickCard from "../Components/Portfolio/Pick.jsx"
@@ -17,6 +16,10 @@ const portfolioPickListStyle = {
     display: "flex",
     justifyContent:"center",
     flexFlow:"column nowrap"
+}
+
+const portfolioInfoStyle = {
+    
 }
 
 function Portfolio() {
@@ -73,6 +76,9 @@ function Portfolio() {
     return <>
         <section style={newPickFormStyle}>
             <NewPickForm portfolioId={portfolioId} setPortfolioResponse={setPortfolioResponse} />
+        </section>
+        <section style={portfolioInfoStyle}>
+
         </section>
         <section style={portfolioPickListStyle}>
             <>{portfolioPickList}</>

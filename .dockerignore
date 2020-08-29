@@ -1,0 +1,8 @@
+Dockerfile
+node_modules
+frontend/tracker/node_modules
+frontend/tracker/build
+docker-compose.yml
+requirements.txt
+.gitignore
+.dockerignore

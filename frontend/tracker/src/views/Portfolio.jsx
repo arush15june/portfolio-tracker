@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Card, Colors } from "@blueprintjs/core";
 import {
     useRouteMatch
 } from 'react-router-dom';
@@ -19,7 +20,10 @@ const portfolioPickListStyle = {
 }
 
 const portfolioInfoStyle = {
-    
+    display: "flex",
+    flex: "1 100%",
+    justifyContent:"center",
+    flexFlow:"column nowrap"
 }
 
 function Portfolio() {
@@ -28,15 +32,13 @@ function Portfolio() {
     const portfolioId = match.params.id
 
     const [portfolioPickList, setPortfolioPickList] = useState(<></>)
-    const [portfolioResponse, setPortfolioResponse] = useState(undefined)
+    const [portfolioResponse, setPortfolioResponse] = useState({})
     
     const generatePickList = async (response) => {
-        console.log("PickList", response)
-        if (!response) {
+        if (Object.keys(response).length === 0) {
             return <></>
         }
         return response.data.picks.map((pick) => {
-            console.log(pick)
             return <PickCard deletePick={deletePick} pick={pick}/>
         })
     }
@@ -57,7 +59,8 @@ function Portfolio() {
     }, [])
 
     useEffect(() => {
-        generatePickList(portfolioResponse).then(async (pickList) => {
+        generatePickList(portfolioResponse).then((pickList) => {
+            console.log(pickList)
             setPortfolioPickList(pickList)
         })
     }, [portfolioResponse])
@@ -73,13 +76,22 @@ function Portfolio() {
         }
     }
     
+    const generateAbsoluteReturn = () => {
+        return <>
+            { portfolioResponse.data.absolute_return >= 0 
+            ? <><span style={{color: Colors.GREEN4}}>+{portfolioResponse.data.absolute_return.toFixed(2)}%</span></>
+            : <><span style={{color: Colors.RED3}}>-{portfolioResponse.data.absolute_return.toFixed(2)}%</span></>}
+        </>
+    }
+    
     return <>
         <section style={newPickFormStyle}>
             <NewPickForm portfolioId={portfolioId} setPortfolioResponse={setPortfolioResponse} />
         </section>
-        <section style={portfolioInfoStyle}>
-
-        </section>
+        {portfolioResponse.hasOwnProperty("status") ? <section style={portfolioInfoStyle}>
+            <h2>{portfolioResponse.data.name} | {generateAbsoluteReturn()}</h2>
+            <pre>{portfolioResponse.data.description}</pre>
+        </section> : <></> }
         <section style={portfolioPickListStyle}>
             <>{portfolioPickList}</>
         </section>

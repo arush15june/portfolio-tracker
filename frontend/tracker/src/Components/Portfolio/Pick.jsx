@@ -27,15 +27,13 @@ function PickCard(props) {
     return (
         <section style={portfolioSectionStyle}>
             <Card style={portfolioStyle}>
-                <h1>{props.pick.stock.symbol} | {getReturn()}</h1>
+                <h1>{props.pick.stock.symbol} | {getReturn()} <span style={{float:"right"}}><Button onClick={async () => { props.deletePick(props.pick.id)}} intent={Intent.DANGER}>Delete</Button></span></h1>
                 <p>Bought on: <strong>{props.pick.bought_date}</strong></p>
-                <p>Bought Price: {props.pick.bought_price}</p>
+                <p>Bought Price: {parseFloat(props.pick.bought_price).toFixed(2)}</p>
                 <p>Allocation: {parseFloat(props.pick.allocation).toFixed(2)}%</p>
                 <hr />
-                <p>Last Price: {props.pick.stock.last_price}</p>
+                <p>Last Price: {parseFloat(props.pick.stock.last_price).toFixed(2)}</p>
                 <p>Last Price Date: {props.pick.stock.last_price_date}</p>
-                <hr />
-                <Button onClick={async () => { props.deletePick(props.pick.id)}} intent={Intent.DANGER}>Delete</Button>
             </Card>
         </section>
     )

@@ -34,7 +34,7 @@ function Home() {
             setPortfolioListError(<p>Error fetching data...</p>)
         }
     }
-
+    
     useEffect(() => {
         fetchSetPortfolioList()
     }, [])

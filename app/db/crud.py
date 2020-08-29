@@ -98,8 +98,8 @@ def create_portfolio_pick(db: Session, portfolio_id: int, pick: schemas.PickCrea
         raise PortfolioNotFoundError(portfolio_id=portfolio_id)
 
     current_allocation = 0.0
-    for pick in db_portfolio.picks:
-        current_allocation += pick.allocation
+    for portfolio_pick in db_portfolio.picks:
+        current_allocation += portfolio_pick.allocation
 
     if current_allocation + pick.allocation > 100.0:
         raise InvalidAllocationError(allocation=pick.allocation)
@@ -113,7 +113,6 @@ def create_portfolio_pick(db: Session, portfolio_id: int, pick: schemas.PickCrea
     
     db.add(db_pick)
     db_portfolio.picks.append(db_pick)
-
 
     try:
         db.commit()

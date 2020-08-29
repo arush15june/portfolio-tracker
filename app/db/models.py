@@ -17,14 +17,14 @@ class Portfolio(Base):
     created_on = Column(DateTime, default=datetime.datetime.utcnow)
     edited_on = Column(DateTime, default=datetime.datetime.utcnow)
 
-    picks = relationship("Pick", backref="portfolio")
+    picks = relationship("Pick", backref="portfolio", order_by="desc(Pick.bought_date)")
 
     @property
     def absolute_return(self):
         absolute_return = 0.0
         
         for pick in self.picks:
-            allocation = pick.allocation
+            allocation = pick.allocation/100.0
             bought_price = pick.bought_price
             bought_date = pick.bought_date
             stock_price = pick.stock.last_price
@@ -52,7 +52,7 @@ class Pick(Base):
 
     @property
     def pick_return(self):
-        return (self.stock.last_price/self.bought_price - 1)*100
+        return (self.stock.last_price/self.bought_price - 1.00)*100
 
 class Stock(Base):
     __tablename__ = "stock"

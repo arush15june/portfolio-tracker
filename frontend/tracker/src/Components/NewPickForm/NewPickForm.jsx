@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import moment from "moment";
-import { DateInput} from "@blueprintjs/datetime";
 import { FormGroup, InputGroup, Button, Popover, Position, PopoverInteractionKind, Spinner } from '@blueprintjs/core'
 import { getSymbolInfo, createPortfolioPick } from  '../../Api/Api.jsx';
 
@@ -90,7 +88,7 @@ function NewPickForm(props) {
         } catch(err) {
             let errMsg = ""
             if (err.response) {
-                if (err.response.data.status == 400) {
+                if (err.response.data.status === 400) {
                     errMsg = err.response.data.detail.error
                 }
             }

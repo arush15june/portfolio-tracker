@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FormGroup, InputGroup, Button, Popover, Position, PopoverInteractionKind, Spinner } from '@blueprintjs/core'
+import { FormGroup, InputGroup, Slider, Button, Popover, Position, PopoverInteractionKind, Spinner } from '@blueprintjs/core'
 import { getSymbolInfo, createPortfolioPick } from  '../../Api/Api.jsx';
 
 const flexCol = {
@@ -24,10 +24,12 @@ const symbolPopoverStyle = {
 }
 
 function NewPickForm(props) {
+    const maxAllocation = props.maxAllocation
     const portfolioId = props.portfolioId
     const setPortfolioResponse = props.setPortfolioResponse
     
     const [symbol, setSymbol] = useState("")
+    const [allocation, setAllocation] = useState(0.0)
     const [symbolPopoverContent, setSymbolPopoverContent] = useState(<div style={symbolPopoverStyle}></div>)
     const [pickResponseError, setPickResponseError] = useState(undefined)
 
@@ -40,7 +42,7 @@ function NewPickForm(props) {
             stock: evt.target.symbol.value,
             bought_price: evt.target.bought_price.value, 
             bought_date: evt.target.bought_date.value,
-            allocation: evt.target.allocation.value
+            allocation: allocation
         }
         
         try {
@@ -131,11 +133,19 @@ function NewPickForm(props) {
                     />
                 </FormGroup>
                 <FormGroup style={formGroupPadding}>
-                    <InputGroup 
+                    <Slider 
+                        labelStepSize={25}
+                        max={100.0}
+                        id="allocation"
+                        onChange={async (val) => { if (val <= maxAllocation) setAllocation(val) }}
+                        stepSize={0.1}
+                        value={allocation}
+                    />
+                    {/* <InputGroup 
                         required
                         id="allocation" 
                         placeholder="Allocation"
-                    />
+                    /> */}
                 </FormGroup>
                 <FormGroup style={{...formGroupPadding}}>
                     <Button type="sumbit" icon="plus">Pick</Button> 

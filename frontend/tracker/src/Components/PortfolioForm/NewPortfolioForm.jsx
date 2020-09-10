@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FormGroup, InputGroup, Button, setHotkeysDialogProps } from '@blueprintjs/core'
+import { FormGroup, InputGroup, Button } from '@blueprintjs/core'
 import { newPortfolio } from  '../../Api/Api.jsx';
 
 

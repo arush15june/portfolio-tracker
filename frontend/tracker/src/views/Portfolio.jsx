@@ -31,6 +31,7 @@ function Portfolio() {
     
     const portfolioId = match.params.id
 
+    const [maxAllocation, setMaxAllocation] = useState(100.0)
     const [portfolioPickList, setPortfolioPickList] = useState(<></>)
     const [portfolioResponse, setPortfolioResponse] = useState({})
     
@@ -43,12 +44,24 @@ function Portfolio() {
         })
     }
     
+    const computeMaxAllocation = async (response) => {
+        const max = 100.0
+        if (Object.keys(response).length === 0) {
+            return max
+        }
+        const totalPickAlloc = response.data.picks.reduce((acc, pick) => acc + pick.allocation, 0)
+        console.log(totalPickAlloc) 
+        return max - totalPickAlloc
+    }
+    
     const initPortfolioResponse = async () => {
         try {
             const response = await getPortfolio(portfolioId)
             if (response.status === 200) {
-                await setPortfolioResponse(response)
+                setPortfolioResponse(response)
+                computeMaxAllocation(response).then((alloc) => setMaxAllocation(alloc))
             }
+
         } catch(err) {
             console.log(err.response)
         }
@@ -60,8 +73,8 @@ function Portfolio() {
 
     useEffect(() => {
         generatePickList(portfolioResponse).then((pickList) => {
-            console.log(pickList)
             setPortfolioPickList(pickList)
+            computeMaxAllocation(portfolioResponse).then((alloc) => setMaxAllocation(alloc))
         })
     }, [portfolioResponse])
     
@@ -86,7 +99,11 @@ function Portfolio() {
     
     return <>
         <section style={newPickFormStyle}>
-            <NewPickForm portfolioId={portfolioId} setPortfolioResponse={setPortfolioResponse} />
+            <NewPickForm 
+                portfolioId={portfolioId} 
+                setPortfolioResponse={setPortfolioResponse}
+                maxAllocation={maxAllocation}
+            />
         </section>
         {portfolioResponse.hasOwnProperty("status") ? <section style={portfolioInfoStyle}>
             <h2>{portfolioResponse.data.name} | {generateAbsoluteReturn()}</h2>
